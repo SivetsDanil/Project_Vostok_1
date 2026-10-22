@@ -1219,35 +1219,6 @@ PART
 		{
 		}
 	}
-	MODULE
-	{
-		name = ModuleDecouplerShroud
-		isEnabled = True
-		nSides = 24
-		shroudEnabled = False
-		autoDetectSize = True
-		topWidth = 1.25
-		botWidth = 1.25
-		thickness = 0.100000001
-		height = 1.25
-		vertOffset = 0
-		segmentIndex = 0
-		textureName = Default
-		segments = 1
-		collPerSegment = 12
-		jettisoned = False
-		invisibleShroud = False
-		stagingEnabled = True
-		EVENTS
-		{
-		}
-		ACTIONS
-		{
-		}
-		UPGRADESAPPLIED
-		{
-		}
-	}
 }
 PART
 {
@@ -2201,35 +2172,6 @@ PART
 		name = ModulePartVariants
 		isEnabled = True
 		useVariantMass = True
-		stagingEnabled = True
-		EVENTS
-		{
-		}
-		ACTIONS
-		{
-		}
-		UPGRADESAPPLIED
-		{
-		}
-	}
-	MODULE
-	{
-		name = ModuleDecouplerShroud
-		isEnabled = True
-		nSides = 24
-		shroudEnabled = False
-		autoDetectSize = True
-		topWidth = 1.25
-		botWidth = 1.25
-		thickness = 0.100000001
-		height = 1.25
-		vertOffset = 0
-		segmentIndex = 0
-		textureName = Default
-		segments = 1
-		collPerSegment = 12
-		jettisoned = False
-		invisibleShroud = False
 		stagingEnabled = True
 		EVENTS
 		{
