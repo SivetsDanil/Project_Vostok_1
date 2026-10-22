@@ -1,0 +1,122 @@
+import math
+
+G0 = 9.80665
+
+
+REAL_LAUNCH_TIME_MSK = "09:06:59.7"
+REAL_LAUNCH_SITE = "Байконур, площадка № 1"
+REAL_LAUNCH_LATITUDE = 45.92
+
+REAL_LAUNCH_MASS = 287000.0
+REAL_SPACECRAFT_MASS = 4725.0
+REAL_DESCENT_MODULE_MASS = 2400.0
+
+REAL_BOOSTER = (43300.0, 3710.0, 970.0e3, 256.0, 313.0, 118.0)
+REAL_CORE = (100400.0, 6800.0, 912.0e3, 248.0, 315.0, 301.0)
+REAL_UPPER = (7775.0, 1440.0, 54.5e3, None, 326.0, 365.0)
+REAL_BOOSTER_COUNT = 4
+
+REAL_PERIGEE = 181.0e3
+REAL_APOGEE = 327.0e3
+REAL_INCLINATION = 64.95
+REAL_PERIOD = 89.1 * 60
+
+REAL_T_BOOSTER_SEP = 119.0
+REAL_T_FAIRING = 156.0
+REAL_T_CORE_SEP = 300.0
+REAL_T_UPPER_CUTOFF = 657.0
+REAL_T_SPACECRAFT_SEP = 667.0
+
+REAL_T_RETRO = 4714.0
+REAL_RETRO_BURN_TIME = 42.0
+REAL_RETRO_DV = 150.0
+REAL_MODULE_SEP_DELAY = 10.0
+REAL_EJECTION_ALTITUDE = 7000.0
+REAL_CHUTE_ALTITUDE = 2500.0
+REAL_REENTRY_MAX_G = (8.0, 10.0)
+REAL_ASCENT_MAX_G = 5.0
+REAL_FLIGHT_TIME = 108 * 60
+
+REAL_EVENTS = [
+    (REAL_T_BOOSTER_SEP, "Отделение боковых блоков"),
+    (REAL_T_FAIRING, "Сброс обтекателя"),
+    (REAL_T_CORE_SEP, "Отделение блока А"),
+    (REAL_T_UPPER_CUTOFF, "Выключение блока Е"),
+]
+
+KERBIN_RADIUS = 600000.0
+KERBIN_MU = 3.5316e12
+KERBIN_ROTATION_PERIOD = 21549.425
+KERBIN_ATM_HEIGHT = 70000.0
+KERBIN_P0 = 101325.0
+KERBIN_RHO0 = 1.225
+KERBIN_SCALE_HEIGHT = 5600.0
+KSC_LATITUDE = -0.0972
+
+TARGET_PERIAPSIS = REAL_PERIGEE
+TARGET_APOAPSIS = REAL_APOGEE
+TARGET_INCLINATION = REAL_INCLINATION
+
+T_VERTICAL = 10.0
+T_BOOSTER_BURN = 118.0
+T_FAIRING = REAL_T_FAIRING
+T_CORE_SEP = REAL_T_CORE_SEP
+SPACECRAFT_SEP_DELAY = REAL_T_SPACECRAFT_SEP - REAL_T_UPPER_CUTOFF
+
+PITCH_AT_BOOSTER_SEP = 52.8
+PITCH_AT_CORE_SEP = 14.0
+
+UPPER_TAU = 40.0
+UPPER_VR_LIMITS = (-60.0, 120.0)
+
+RETRO_ORBIT_FRACTION = (REAL_T_RETRO - REAL_T_SPACECRAFT_SEP) / REAL_PERIOD
+REENTRY_PERIAPSIS = 30000.0
+MODULE_SEP_DELAY = REAL_MODULE_SEP_DELAY
+EJECTION_ALTITUDE = REAL_EJECTION_ALTITUDE
+CHUTE_ALTITUDE = REAL_CHUTE_ALTITUDE
+
+
+ENGINES = {
+    "Reliant": (240.0e3, 265.0, 310.0, 1250.0),
+    "Spark": (20.0e3, 265.0, 320.0, 130.0),
+    "Terrier": (60.0e3, 85.0, 345.0, 500.0),
+}
+
+KSP_BOOSTER_PARTS = ("Reliant", 4, 0.506, 4714.0, 880.0)
+KSP_CORE_PARTS = ("Spark", 1, 0.65, 1245.0, 840.0)
+KSP_UPPER_PARTS = ("Terrier", 1, 0.285, 1918.0, 290.0)
+KSP_FAIRING_MASS = 150.0
+KSP_SPACECRAFT_MASS = 1630.0
+KSP_DESCENT_MODULE_MASS = 1240.0
+KSP_RETRO_LIMITER = 0.29
+
+
+def ksp_block(parts):
+    engine, count, limiter, propellant, structure = parts
+    thrust, isp_sl, isp_vac, engine_mass = ENGINES[engine]
+    dry = engine_mass + structure
+    return count, dry + propellant, dry, thrust * limiter, isp_sl, isp_vac
+
+
+KSP_BOOSTER = ksp_block(KSP_BOOSTER_PARTS)
+KSP_CORE = ksp_block(KSP_CORE_PARTS)
+KSP_UPPER = ksp_block(KSP_UPPER_PARTS)
+KSP_RETRO_ENGINE = (ENGINES["Spark"][0] * KSP_RETRO_LIMITER, ENGINES["Spark"][1], ENGINES["Spark"][2])
+
+KSP_CDA_PACKET = 3.0
+KSP_CDA_CORE = 0.9
+KSP_CDA_CAPSULE = 1.5
+KSP_CDA_CHUTE_SEMI = 5.0
+KSP_CDA_CHUTE = 400.0
+CHUTE_OPENING_TIME = 4.0
+
+
+def launch_heading(inclination=TARGET_INCLINATION, latitude=KSC_LATITUDE,
+                   altitude=TARGET_PERIAPSIS, apoapsis=TARGET_APOAPSIS):
+    lat = math.radians(latitude)
+    beta = math.asin(min(1.0, math.cos(math.radians(inclination)) / math.cos(lat)))
+    r_p = KERBIN_RADIUS + altitude
+    a = KERBIN_RADIUS + (altitude + apoapsis) / 2
+    v_orbit = math.sqrt(KERBIN_MU * (2 / r_p - 1 / a))
+    v_rot = 2 * math.pi * KERBIN_RADIUS / KERBIN_ROTATION_PERIOD * math.cos(lat)
+    return math.degrees(math.atan2(v_orbit * math.sin(beta) - v_rot, v_orbit * math.cos(beta)))
